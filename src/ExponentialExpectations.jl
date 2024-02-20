@@ -1,5 +1,7 @@
 module ExponentialExpectations
 
-# Write your package code here.
+    include("expectations_exponential.jl")
+
+    export E, B, V, Elognormal
 
 end
