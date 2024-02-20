@@ -10,12 +10,15 @@ E_(μ, σ)  = exp(μ + σ^2 / 2)
 
 E_(μ, σ, b)  = exp(μ + σ^2 / 2 + b)
 
-# ∫ exp(a*x) N(x|μ,σ) dx
+# ∫ exp(a*x+b) N(x|μ,σ) dx
 
 E_(a, μ, σ, b) = E_(a*μ, a*σ, b)
 
 # The method below will be the one used
 
+"""
+∫ exp(a*x+b) N(x|μ,σ) dx
+"""
 E(;a = 1.0, μ = μ, σ = σ, b = 0.0) = E_(a, μ, σ, b)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -23,7 +26,7 @@ E(;a = 1.0, μ = μ, σ = σ, b = 0.0) = E_(a, μ, σ, b)
 # let
 #     a, μ, σ, b = 1.7, -1.2, 0.5, 1.0
 #     p = Normal(μ, σ)
-#     quadgk(x -> pdf(p,x) * exp(a*x+b),-30.0,30.0)[1], PositiveGP.E(α=a, μ=μ, σ=σ, b=b)
+#     quadgk(x -> pdf(p,x) * exp(a*x+b),-30.0,30.0)[1], E(α=a, μ=μ, σ=σ, b=b)
 #  end
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -38,6 +41,9 @@ B_(μ, σ, b) = E_(2*μ, 2*σ, 2*b)
 
 B_(α, μ, σ, b) = E_(2*α*μ, 2*α*σ, 2b)
 
+"""
+∫ [exp(a*x+b)]² N(x|μ,σ) dx
+"""
 B(;a=a, μ=μ, σ=σ, b=b) = E_(2*a*μ, 2*a*σ, 2b)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -45,7 +51,7 @@ B(;a=a, μ=μ, σ=σ, b=b) = E_(2*a*μ, 2*a*σ, 2b)
 #     let
 #     a, μ, σ, b = 1.7, 1.2, 0.85, 1.0
 #     p = Normal(μ, σ)
-#     quadgk(x -> pdf(p,x) * exp(a*x+b)^2,-30.0,30.0)[1], PositiveGP.E²(a=a, μ=μ,σ= σ,b= b)
+#     quadgk(x -> pdf(p,x) * exp(a*x+b)^2,-30.0,30.0)[1], E²(a=a, μ=μ,σ= σ,b= b)
 # end
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -60,14 +66,19 @@ V_(α, μ, σ) = B_(α, μ, σ) - E_(α, μ, σ)^2
 
 V_(α, μ, σ, b) = B_(α, μ, σ, b) - E_(α, μ, σ, b)^2
 
+"""
+∫ [exp(a*x+b) - m]² N(x|μ,σ) dx, 
+
+where m = ∫ exp(a*x+b) N(x|μ,σ) dx
+"""
 V(;a=a, μ=μ, σ=σ, b=b) = V_(a, μ, σ, b)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 # Test with block below
 # let
 #     a, μ, σ, b = 1.9, -1.2, 0.95, 3.0
-#     p = Normal(μ, σ); m = PositiveGP.E(a=a, μ=μ, σ=σ, b=b)
-#     quadgk(x -> pdf(p,x) * (exp(a*x+b)-m)^2,-23.0,23.0)[1], PositiveGP.V(a, μ, σ, b)
+#     p = Normal(μ, σ); m = E(a=a, μ=μ, σ=σ, b=b)
+#     quadgk(x -> pdf(p,x) * (exp(a*x+b)-m)^2,-23.0,23.0)[1], V(a, μ, σ, b)
 # end
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -94,7 +105,7 @@ Exy(;a₁=a₁, μ₁=μ₁, σ₁=σ₁, a₂=a₂, μ₂=μ₂, σ₂=σ₂, b
 #     a₂, μ₂, σ₂ = 1, -0.9, 0.75
 #     p₁ = Normal(μ₁, σ₁)
 #     p₂ = Normal(μ₂, σ₂)
-#     hcubature(xy -> pdf(p₁,xy[1]) * pdf(p₂,xy[2]) * exp(a₁*xy[1] + a₂*xy[2] + b),-30.0*ones(2),30.0*ones(2))[1], PositiveGP.Exy(a₁=a₁, μ₁=μ₁, σ₁=σ₁, a₂=a₂, μ₂=μ₂, σ₂=σ₂, b=b)
+#     hcubature(xy -> pdf(p₁,xy[1]) * pdf(p₂,xy[2]) * exp(a₁*xy[1] + a₂*xy[2] + b),-30.0*ones(2),30.0*ones(2))[1], Exy(a₁=a₁, μ₁=μ₁, σ₁=σ₁, a₂=a₂, μ₂=μ₂, σ₂=σ₂, b=b)
 # end
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
@@ -104,7 +115,9 @@ Exy(;a₁=a₁, μ₁=μ₁, σ₁=σ₁, a₂=a₂, μ₂=μ₂, σ₂=σ₂, b
 #---------------------------------------------#
 # ∫ N(x|μ, σ) log N(y | exp(a⋅x + b), β⁻¹) dx #
 #---------------------------------------------#
-
+"""
+∫ N(x|μ, σ) log N(y | exp(a⋅x + b), β⁻¹) dx
+"""
 Elognormal(;y=y, a=a, μ=μ, b=b, σ=σ, β=β) = -0.5*log(2π) + 0.5*log(β) - 0.5*β*abs2(y - E(a = a, μ = μ, σ = σ, b = b)) - β/2 * V(a = a, μ = μ, σ = σ, b = b)
 
 # Elognormal(y, a, μ, b, σ, β) = logpdf(Normal(E(a = a, μ = μ, σ = σ, b = b), sqrt(1/β)), y) - β/2 * V(a = a, μ = μ, σ = σ, b = b)
@@ -115,7 +128,7 @@ Elognormal(;y=y, a=a, μ=μ, b=b, σ=σ, β=β) = -0.5*log(2π) + 0.5*log(β) - 
     
 #     p = Normal(μ, σ)
 
-#     quadgk(x -> pdf(p, x) * logpdf(Normal(exp(a*x+b), sqrt(1/β)), y),-23.0,23.0)[1], PositiveGP.Elognormal(;y=y, a=a, μ=μ, b=b, σ=σ, β=β)
+#     quadgk(x -> pdf(p, x) * logpdf(Normal(exp(a*x+b), sqrt(1/β)), y),-23.0,23.0)[1], Elognormal(;y=y, a=a, μ=μ, b=b, σ=σ, β=β)
 
 # end
 
