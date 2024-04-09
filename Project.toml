@@ -1,7 +1,7 @@
 name = "ExponentialExpectations"
 uuid = "514699ec-cad0-4573-b799-e90939df45ca"
 authors = ["Nikos Gianniotis <ngiann@gmail.com> and contributors"]
-version = "0.0.3"
+version = "0.0.4"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
